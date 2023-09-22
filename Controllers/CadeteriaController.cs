@@ -31,9 +31,9 @@ public class CadeteriaController : ControllerBase
     [Route("InfoCadetes")]
     public ActionResult<IEnumerable<Cadete>> GetInfoCadetes(){
         if(!datosCargados){
-            return Ok(oca.ListaCadetes);
-        } else{
             return NotFound("ERROR. Información no encontrada.");
+        } else{
+            return Ok(oca.ListaCadetes);
         }
     }
 

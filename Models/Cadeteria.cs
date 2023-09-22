@@ -11,8 +11,8 @@ public class Cadeteria
     private List<Cadete> listaCadetes;
     private List<Pedido> listaPedidos;
 
-    public string Nombre { get => nombre;}
-    public string Telefono { get => telefono;}
+    public string Nombre { get => nombre; set => nombre = value;}
+    public string Telefono { get => telefono; set => telefono = value;}
     public List<Cadete> ListaCadetes { get => listaCadetes;}
     public List<Pedido> ListaPedidos { get => listaPedidos;}
 
