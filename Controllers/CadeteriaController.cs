@@ -5,6 +5,7 @@ namespace tl2_tp4_2023_adanSmith01.Controllers;
 [Route("[controller]")]
 public class CadeteriaController : ControllerBase
 {
+    private static bool datosCargados = false;
     private readonly ILogger<CadeteriaController> _logger;
     private Cadeteria oca;
     private List<Cadete> listaCadetes;
@@ -18,8 +19,8 @@ public class CadeteriaController : ControllerBase
     [HttpGet]
     [Route("InfoCadeteria")]
     public ActionResult<string> GetInfo(){
-        if(String.IsNullOrEmpty(oca.Nombre)){
-            return BadRequest("ERROR. Información no definida.");
+        if(!datosCargados){
+            return NotFound("ERROR. Información no definida.");
         } else{
             string info = oca.Nombre + "," + oca.Telefono;
             return Ok(info);
@@ -29,10 +30,10 @@ public class CadeteriaController : ControllerBase
     [HttpGet]
     [Route("InfoCadetes")]
     public ActionResult<IEnumerable<Cadete>> GetInfoCadetes(){
-        if(oca.ListaCadetes.Count != 0){
+        if(!datosCargados){
             return Ok(oca.ListaCadetes);
         } else{
-            return StatusCode(500, "ERROR en el servidor");
+            return NotFound("ERROR. Información no encontrada.");
         }
     }
 
@@ -46,11 +47,22 @@ public class CadeteriaController : ControllerBase
         }
     }
 
+    [HttpGet]
+    [Route("Informe")]
+    public ActionResult<Informe> GetInforme(){
+        if(!datosCargados){
+            return BadRequest("ERROR. Acceso a recurso no permitido.");
+        } else{
+            return Ok(oca.CrearInforme());
+        }
+    }
+
     [HttpPost("CargaDatos")]
     public ActionResult<string> CargaInicialDatos(string tipoAcceso){
         if(!oca.CargaDatosIniciales(tipoAcceso)){
             return StatusCode(500, "ERROR. No se cargaron los datos correctamente.");
         } else{
+            datosCargados = true;
             return Ok("Datos cargados correctamente");
         }
     }
@@ -64,4 +76,30 @@ public class CadeteriaController : ControllerBase
         }
     }
     
+    [HttpPut("AsignarPedido")]
+    public ActionResult<string> AsignacionP(int idCadete, int nroPedido){
+        if(!oca.AsignarCadeteAPedido(idCadete, nroPedido)){
+            return BadRequest("ERROR. ID de cadete o nro pedido no existentes");
+        } else{
+            return Ok("Asignación realizada con éxito");
+        }
+    }
+
+    [HttpPut("CambiarEstadoPedido")]
+    public ActionResult<string> CambiarEstadoPedido(int nroPedido, int nuevoEstado){
+        if(!oca.CambiarEstadoPedido(nroPedido, nuevoEstado)){
+            return BadRequest("ERROR. No se pudo completar la operacion");
+        } else{
+            return Ok("Cambio de estado del pedido realizado exitosamente");
+        }
+    }
+
+    [HttpPut("CambiarCadetePedido")]
+    public ActionResult<string> ReasignarPedido(int nroPedido, int idCadeteAReasignar){
+        if(!oca.ReasignarPedidoACadete(nroPedido, idCadeteAReasignar)){
+            return BadRequest("ERROR. No se puede realizar la operacion");
+        } else{
+            return Ok("Cambio de cadete a pedido realizado exitosamente");
+        }
+    }
 }
