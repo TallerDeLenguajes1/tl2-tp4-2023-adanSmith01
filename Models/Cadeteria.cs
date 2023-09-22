@@ -1,4 +1,6 @@
 namespace tl2_tp4_2023_adanSmith01;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 public class Cadeteria
 {
@@ -75,5 +77,79 @@ public class Cadeteria
         }
 
         return agregado;
+    }
+
+    public bool AsignarCadeteAPedido(int idCadete, int nroPedido){
+        bool asignacionRealizada = false;
+        Cadete cad = listaCadetes.Find(x => x.Id == idCadete);
+
+        if(cad != null){
+            foreach(var p in listaPedidos){
+                if(p.Nro == nroPedido){
+                    p.VincularCadete(cad);
+                    asignacionRealizada = true;
+                    break;
+                }
+            }
+        }
+
+        return asignacionRealizada;
+    }
+
+    public bool CambiarEstadoPedido(int nroPedido, int nuevoEstado){
+        foreach (var p in listaPedidos){
+            if(p.Nro == nroPedido) {
+                p.CambiarEstado(nuevoEstado);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool ReasignarPedidoACadete(int nroPedido, int idCadete){
+        bool reasignacionRealizada = false;
+        Cadete cad = listaCadetes.Find(cadete => cadete.Id == idCadete);
+
+        if(cad != null){
+            foreach(var p in listaPedidos){
+                if(p.Nro == nroPedido && p.Estado != EstadoPedido.Entregado){
+                    p.VincularCadete(cad);
+                    reasignacionRealizada = true;
+                }
+            }
+        }
+
+        return reasignacionRealizada;
+    }
+
+    public int CantPedidosCadete(int idCadete, EstadoPedido estado){
+        int cant = 0;
+        foreach(var p in listaPedidos){
+            if((p.ExisteCadete()) && (p.IdCadete() == idCadete) && (p.Estado == estado)) cant++;
+        }
+
+        return cant;
+    }
+    public double JornalACobrar(int idCadete){
+        return ((double)500 * CantPedidosCadete(idCadete, EstadoPedido.Entregado));
+    }
+
+    public Informe CrearInforme(){
+        List<int> idsCadetes = listaCadetes.Select(cad => cad.Id).ToList();
+        List<string> nombresCadetes = listaCadetes.Select(cad => cad.Nombre).ToList();
+
+        List<int> cantPedidosEntregadosCadetes = new List<int>();
+        List<double> montosCadetes = new List<double>();
+        foreach(var cad in listaCadetes){
+            cantPedidosEntregadosCadetes.Add(CantPedidosCadete(cad.Id, EstadoPedido.Entregado));
+            montosCadetes.Add(JornalACobrar(cad.Id));
+        }
+        
+        int totalPedidosEntregados = cantPedidosEntregadosCadetes.Sum();
+        int cantPromedioDePedidosEntregados = (int)cantPedidosEntregadosCadetes.Average();
+
+        Informe informe = new Informe(listaCadetes.Count, idsCadetes, nombresCadetes, cantPedidosEntregadosCadetes, montosCadetes, totalPedidosEntregados, cantPromedioDePedidosEntregados);
+        return informe;
     }
 }

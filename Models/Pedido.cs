@@ -5,11 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 public enum EstadoPedido
 {
-    [EnumMember(Value = "Entregado")]
-    Entregado,
-
     [EnumMember(Value = "Pendiente")]
-    Pendiente
+    Pendiente,
+
+    [EnumMember(Value = "Entregado")]
+    Entregado
+
 }
 
 public class Pedido
@@ -42,5 +43,21 @@ public class Pedido
     
     public void VincularCadete(Cadete cad){
         cadete = cad;
+    }
+
+    public void CambiarEstado(int estado){
+        switch(estado){
+            case 0: this.estado = EstadoPedido.Pendiente;
+            break;
+            case 1: this.estado = EstadoPedido.Entregado;
+            break;
+        }
+    }
+
+    public bool ExisteCadete(){
+        return (cadete != null);
+    }
+    public int IdCadete(){
+        return cadete.Id;
     }
 }
