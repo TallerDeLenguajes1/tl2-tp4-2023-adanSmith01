@@ -2,7 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 namespace tl2_tp4_2023_adanSmith01;
 
-public abstract class AccesoDatosCadeteria
+public abstract class AccesoDatos
 {
     public abstract Cadeteria ObtenerInfoCadeteria(string rutaDatosCadeteria);
     public abstract List<Cadete> ObtenerListaCadetes(string rutaDatosCadetes);
@@ -18,7 +18,7 @@ public abstract class AccesoDatosCadeteria
     }
 }
 
-public class AccesoCSV : AccesoDatosCadeteria
+public class AccesoCSV : AccesoDatos
 {
     
     public override Cadeteria ObtenerInfoCadeteria(string rutaDatosCadeteria){
@@ -52,7 +52,7 @@ public class AccesoCSV : AccesoDatosCadeteria
     }
 }
 
-public class AccesoJSON : AccesoDatosCadeteria
+public class AccesoJSON : AccesoDatos
 {
     public override Cadeteria ObtenerInfoCadeteria(string rutaDatosCadeteria){
         string infoCadeteria = File.ReadAllText(rutaDatosCadeteria);

@@ -14,6 +14,7 @@ public class CadeteriaController : ControllerBase
     {
         _logger = logger;
         oca = Cadeteria.GetCadeteria();
+        if(oca != null) datosCargados = true;
     }
 
     [HttpGet]
@@ -40,8 +41,8 @@ public class CadeteriaController : ControllerBase
     [HttpGet]
     [Route("InfoPedidos")]
     public ActionResult<IEnumerable<Pedido>> GetInfoPedidos(){
-        if(oca.ListaPedidos.Count != 0){
-            return Ok(oca.ListaPedidos);
+        if(oca.AccesoADatosPedidos.ObtenerListaPedidos().Count != 0){
+            return Ok(oca.AccesoADatosPedidos.ObtenerListaPedidos());
         }else{
             return BadRequest("ERROR en el servidor");
         }
@@ -54,16 +55,6 @@ public class CadeteriaController : ControllerBase
             return BadRequest("ERROR. Acceso a recurso no permitido.");
         } else{
             return Ok(oca.CrearInforme());
-        }
-    }
-
-    [HttpPost("CargaDatos")]
-    public ActionResult<string> CargaInicialDatos(string tipoAcceso){
-        if(!oca.CargaDatosIniciales(tipoAcceso)){
-            return StatusCode(500, "ERROR. No se cargaron los datos correctamente.");
-        } else{
-            datosCargados = true;
-            return Ok("Datos cargados correctamente");
         }
     }
 
