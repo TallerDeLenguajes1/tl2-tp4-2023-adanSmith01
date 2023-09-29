@@ -6,16 +6,15 @@ public class Cadeteria
     private  AccesoADatosCadeteria accesoDatosCadeteria;
     private AccesoADatosCadetes accesoDatosCadetes;
     private static AccesoDatos accesoDatos;
-    private static Cadeteria singleCadeteria;
+    private static Cadeteria instance;
+    private List<Cadete> listaCadetes;
     private string nombre;
     private string telefono;
-    private List<Cadete> listaCadetes;
 
     public string Nombre { get => nombre; set => nombre = value;}
     public string Telefono { get => telefono; set => telefono = value;}
-    public List<Cadete> ListaCadetes { get => listaCadetes;}
     public AccesoADatosPedidos AccesoADatosPedidos {get => accesoDatosPedidos;}
-    //public List<Pedido> ListaPedidos { get => listaPedidos;}
+    public List<Cadete> ListaCadetes { get => listaCadetes; }
 
     public Cadeteria(){}
     public Cadeteria(string nombre, string telefono){
@@ -24,24 +23,18 @@ public class Cadeteria
     }
 
     public static Cadeteria GetCadeteria(){
-        if(singleCadeteria == null){
-            singleCadeteria.CargaDatosIniciales();
-            singleCadeteria.SetAccesoDatosPedidos(new AccesoADatosPedidos());
+        if(instance == null){
+            var accesoDatosCadeteria = new AccesoADatosCadeteria();
+            if(accesoDatosCadeteria.ObtenerInfoCadeteria() != null){
+                instance = accesoDatosCadeteria.ObtenerInfoCadeteria();
+                instance.accesoDatosCadetes = new AccesoADatosCadetes();
+                if(instance.accesoDatosCadetes.ObtenerListaCadetes().Count != 0){
+                    instance.AgregarListaCadetes(instance.accesoDatosCadetes.ObtenerListaCadetes());
+                    instance.accesoDatosPedidos = new AccesoADatosPedidos();
+                }
+            } 
         }
-        return singleCadeteria;
-    }
-
-    public void SetAccesoDatosPedidos(AccesoADatosPedidos accesoD){
-        singleCadeteria.accesoDatosPedidos = accesoD;
-    }
-
-    public void CargaDatosIniciales(){
-        accesoDatosCadeteria = new AccesoADatosCadeteria();
-        accesoDatosCadetes = new AccesoADatosCadetes();
-        if(accesoDatosCadeteria.ObtenerInfoCadeteria("cadeteriaInfo.json") != null && accesoDatosCadetes.ObtenerListaCadetes("cadetesInfo.json").Count != 0){
-            singleCadeteria = accesoDatosCadeteria.ObtenerInfoCadeteria("cadeteriaInfo.json");
-            singleCadeteria.AgregarListaCadetes(accesoDatosCadetes.ObtenerListaCadetes("cadetesInfo.json"));
-        }
+        return instance;
     }
 
     public void AgregarListaCadetes(List<Cadete> listaCadetes){
@@ -61,7 +54,7 @@ public class Cadeteria
 
         if(ped != null){
             listaPedidos.Add(ped);
-            singleCadeteria.accesoDatosPedidos.GuardarLista(listaPedidos);
+            instance.accesoDatosPedidos.GuardarLista(listaPedidos);
             agregado = true;
         }
 
@@ -78,7 +71,7 @@ public class Cadeteria
                 if(p.Nro == nroPedido){
                     p.VincularCadete(cad);
                     asignacionRealizada = true;
-                    singleCadeteria.accesoDatosPedidos.GuardarLista(listaPedidos);
+                    instance.accesoDatosPedidos.GuardarLista(listaPedidos);
                     break;
                 }
             }
@@ -92,7 +85,7 @@ public class Cadeteria
         foreach (var p in listaPedidos){
             if(p.Nro == nroPedido) {
                 p.CambiarEstado(nuevoEstado);
-                singleCadeteria.accesoDatosPedidos.GuardarLista(listaPedidos);
+                instance.accesoDatosPedidos.GuardarLista(listaPedidos);
                 return true;
             }
         }
@@ -110,7 +103,7 @@ public class Cadeteria
                 if(p.Nro == nroPedido && p.Estado != EstadoPedido.Entregado){
                     p.VincularCadete(cad);
                     reasignacionRealizada = true;
-                    singleCadeteria.accesoDatosPedidos.GuardarLista(listaPedidos);
+                    instance.accesoDatosPedidos.GuardarLista(listaPedidos);
                 }
             }
         }

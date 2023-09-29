@@ -18,5 +18,4 @@ public class Cadete
         this.direccion = direccion;
         this.telefono = telefono;
     }
-
 }
