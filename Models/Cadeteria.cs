@@ -25,7 +25,6 @@ public class Cadeteria
 
     public static Cadeteria GetCadeteria(){
         if(singleCadeteria == null){
-            singleCadeteria = new Cadeteria();
             singleCadeteria.CargaDatosIniciales();
             singleCadeteria.SetAccesoDatosPedidos(new AccesoADatosPedidos());
         }
