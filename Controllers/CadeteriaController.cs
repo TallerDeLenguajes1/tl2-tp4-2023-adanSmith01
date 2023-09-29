@@ -5,7 +5,7 @@ namespace tl2_tp4_2023_adanSmith01.Controllers;
 [Route("[controller]")]
 public class CadeteriaController : ControllerBase
 {
-    private static bool datosCargados = false;
+    private bool datosCargados = false;
     private readonly ILogger<CadeteriaController> _logger;
     private Cadeteria oca;
     private List<Cadete> listaCadetes;
@@ -44,7 +44,7 @@ public class CadeteriaController : ControllerBase
         if(oca.AccesoADatosPedidos.ObtenerListaPedidos().Count != 0){
             return Ok(oca.AccesoADatosPedidos.ObtenerListaPedidos());
         }else{
-            return BadRequest("ERROR en el servidor");
+            return NotFound("ERROR.Recurso no encontrado");
         }
     }
 
@@ -52,7 +52,7 @@ public class CadeteriaController : ControllerBase
     [Route("Informe")]
     public ActionResult<Informe> GetInforme(){
         if(!datosCargados){
-            return BadRequest("ERROR. Acceso a recurso no permitido.");
+            return NotFound("ERROR. Acceso a recurso denegado.");
         } else{
             return Ok(oca.CrearInforme());
         }
@@ -66,7 +66,7 @@ public class CadeteriaController : ControllerBase
             return Ok("Pedido dado de alta exitosamente");
         }
     }
-    
+
     [HttpPut("AsignarPedido")]
     public ActionResult<string> AsignacionP(int idCadete, int nroPedido){
         if(!oca.AsignarCadeteAPedido(idCadete, nroPedido)){
