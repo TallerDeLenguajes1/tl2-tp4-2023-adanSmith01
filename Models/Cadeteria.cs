@@ -7,14 +7,15 @@ public class Cadeteria
     private AccesoADatosCadetes accesoDatosCadetes;
     private static AccesoDatos accesoDatos;
     private static Cadeteria instance;
-    private List<Cadete> listaCadetes;
     private string nombre;
     private string telefono;
+    private List<Pedido> listaPedidos;
+    private List<Cadete> listaCadetes;
 
     public string Nombre { get => nombre; set => nombre = value;}
     public string Telefono { get => telefono; set => telefono = value;}
-    public AccesoADatosPedidos AccesoADatosPedidos {get => accesoDatosPedidos;}
-    public List<Cadete> ListaCadetes { get => listaCadetes; }
+    public List<Pedido> ListaPedidos {get => accesoDatosPedidos.ObtenerListaPedidos();}
+    public List<Cadete> ListaCadetes { get => accesoDatosCadetes.ObtenerListaCadetes();}
 
     public Cadeteria(){}
     public Cadeteria(string nombre, string telefono){
@@ -28,17 +29,22 @@ public class Cadeteria
             if(accesoDatosCadeteria.ObtenerInfoCadeteria() != null){
                 instance = accesoDatosCadeteria.ObtenerInfoCadeteria();
                 instance.accesoDatosCadetes = new AccesoADatosCadetes();
-                if(instance.accesoDatosCadetes.ObtenerListaCadetes().Count != 0){
-                    instance.AgregarListaCadetes(instance.accesoDatosCadetes.ObtenerListaCadetes());
-                    instance.accesoDatosPedidos = new AccesoADatosPedidos();
-                }
+                instance.accesoDatosPedidos = new AccesoADatosPedidos();
             } 
         }
         return instance;
     }
 
-    public void AgregarListaCadetes(List<Cadete> listaCadetes){
-        this.listaCadetes = listaCadetes;
+    public bool GuardarCadete(Cadete cadeteNuevo){
+        bool guardadoRealizado = false;
+        if(cadeteNuevo != null){
+            var cadetes = accesoDatosCadetes.ObtenerListaCadetes();
+            cadetes.Add(cadeteNuevo);
+            guardadoRealizado = true;
+            accesoDatosCadetes.GuardarListaCadetes(cadetes);
+        }
+
+        return guardadoRealizado;
     }
 
     public bool DarAltaPedido(string obsPedido, string nombreCliente, string direccionCliente, string telCliente, string datosReferenciaDireccionCliente){
@@ -62,6 +68,7 @@ public class Cadeteria
     }
 
     public bool AsignarCadeteAPedido(int idCadete, int nroPedido){
+        List<Cadete> listaCadetes = accesoDatosCadetes.ObtenerListaCadetes();
         List<Pedido> listaPedidos = accesoDatosPedidos.ObtenerListaPedidos();
         bool asignacionRealizada = false;
         Cadete cad = listaCadetes.Find(x => x.Id == idCadete);
@@ -94,6 +101,7 @@ public class Cadeteria
     }
 
     public bool ReasignarPedidoACadete(int nroPedido, int idCadete){
+        List<Cadete> listaCadetes = accesoDatosCadetes.ObtenerListaCadetes();
         List<Pedido> listaPedidos = accesoDatosPedidos.ObtenerListaPedidos();
         bool reasignacionRealizada = false;
         Cadete cad = listaCadetes.Find(cadete => cadete.Id == idCadete);
@@ -125,6 +133,7 @@ public class Cadeteria
     }
 
     public Informe CrearInforme(){
+        List<Cadete> listaCadetes = accesoDatosCadetes.ObtenerListaCadetes();
         List<int> idsCadetes = listaCadetes.Select(cad => cad.Id).ToList();
         List<string> nombresCadetes = listaCadetes.Select(cad => cad.Nombre).ToList();
 
@@ -140,5 +149,17 @@ public class Cadeteria
 
         Informe informe = new Informe(listaCadetes.Count, idsCadetes, nombresCadetes, cantPedidosEntregadosCadetes, montosCadetes, totalPedidosEntregados, cantPromedioDePedidosEntregados);
         return informe;
+    }
+
+    public Pedido ObtenerPedido(int nroPedido){
+        var listaPedidos = accesoDatosPedidos.ObtenerListaPedidos();
+        Pedido ped = listaPedidos.FirstOrDefault(p => p.Nro == nroPedido);
+        return ped;
+    }
+
+    public Cadete ObtenerCadete(int idCadete){
+        var listaCadetes = accesoDatosCadetes.ObtenerListaCadetes();
+        Cadete cad = listaCadetes.FirstOrDefault(cadete => cadete.Id == idCadete);
+        return cad;
     }
 }
