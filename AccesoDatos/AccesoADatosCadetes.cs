@@ -15,4 +15,10 @@ public class AccesoADatosCadetes
         
         return cadetes;
     }
+
+    public void GuardarListaCadetes(List<Cadete> cadetes){
+        string rutaDatosCadetes = "cadetesInfo.json";
+        string infoCadetes = JsonSerializer.Serialize(cadetes);
+        File.WriteAllText(rutaDatosCadetes, infoCadetes);
+    }
 }
