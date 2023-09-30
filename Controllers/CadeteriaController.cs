@@ -34,17 +34,23 @@ public class CadeteriaController : ControllerBase
         if(!datosCargados){
             return NotFound("ERROR. Información no encontrada.");
         } else{
-            return Ok(oca.ListaCadetes);
+            List<Cadete> lista = oca.ListaCadetes;
+            if(lista.Count != 0){
+                return Ok(lista);
+            }else{
+                return StatusCode(500, "ERROR en el servidor");
+            }
         }
     }
 
     [HttpGet]
     [Route("InfoPedidos")]
     public ActionResult<IEnumerable<Pedido>> GetInfoPedidos(){
-        if(oca.AccesoADatosPedidos.ObtenerListaPedidos().Count != 0){
-            return Ok(oca.AccesoADatosPedidos.ObtenerListaPedidos());
+        List<Pedido> lista = oca.ListaPedidos;
+        if(lista.Count != 0){
+            return Ok(lista);
         }else{
-            return NotFound("ERROR.Recurso no encontrado");
+            return NotFound("ERROR. Recurso no encontrado");
         }
     }
 
@@ -58,8 +64,41 @@ public class CadeteriaController : ControllerBase
         }
     }
 
+    [HttpGet]
+    [Route("BuscarPedido/{nro}")]
+    public ActionResult<Pedido> GetPedido(int nro){
+        var ped = oca.ObtenerPedido(nro);
+        if(ped != null){
+            return Ok(ped);
+        } else{
+            return NotFound("No se encontro el pedido solicitado");
+        }
+    }
+
+    [HttpGet]
+    [Route("BuscarCadete/{idCadete}")]
+    public ActionResult<Cadete> GetCadete(int idCadete){
+        var cadete = oca.ObtenerCadete(idCadete);
+        if(cadete != null){
+            return Ok(cadete);
+        } else{
+            return NotFound("No se encontro el cadete solicitado");
+        }
+    }
+
+    [HttpPost("AltaCadete")]
+    public ActionResult<string> DarAltaCadete(string nombreCadete, string direccionCadete, string telCadete){
+        if(String.IsNullOrEmpty(nombreCadete) || String.IsNullOrEmpty(direccionCadete) || String.IsNullOrEmpty(telCadete)){
+            return BadRequest("ERROR. No se ingresaron los datos necesarios.");
+        }else{
+            Cadete nuevoCadete = new Cadete(oca.ListaCadetes.Count, nombreCadete, direccionCadete, telCadete);
+            if(!oca.GuardarCadete(nuevoCadete)) return StatusCode(500, "ERROR en el servidor");
+            return Ok("Se ha dado de alta al cadete correctamente");
+        }
+    }
+
     [HttpPost("DarAltaPedido")]
-    public ActionResult<string> DarAlta(string obsPedido, string nombreCliente, string direccionCliente, string telCliente, string datosReferenciaDireccionCliente){
+    public ActionResult<string> DarAltaPedido(string obsPedido, string nombreCliente, string direccionCliente, string telCliente, string datosReferenciaDireccionCliente){
         if(!oca.DarAltaPedido(obsPedido, nombreCliente,direccionCliente,telCliente, datosReferenciaDireccionCliente)){
             return BadRequest("ERROR. El pedido no puede ser registrado");
         } else{
