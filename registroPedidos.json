@@ -1,1 +1,0 @@
-[{"Nro":1,"Observaciones":null,"Estado":"Pendiente","Cadete":null,"Cliente":{"Nombre":"cliente1","Direccion":"direccion1","Telefono":"tel1","DatosReferenciaDireccion":"datos1"}},{"Nro":2,"Observaciones":"pedido2","Estado":"Pendiente","Cadete":null,"Cliente":{"Nombre":"cliente2","Direccion":"direccion2","Telefono":"tel2","DatosReferenciaDireccion":"datos2"}}]
