@@ -68,20 +68,16 @@ public class Cadeteria
     }
 
     public bool AsignarCadeteAPedido(int idCadete, int nroPedido){
+        bool asignacionRealizada = false;
         List<Cadete> listaCadetes = accesoDatosCadetes.ObtenerListaCadetes();
         List<Pedido> listaPedidos = accesoDatosPedidos.ObtenerListaPedidos();
-        bool asignacionRealizada = false;
-        Cadete cad = listaCadetes.Find(x => x.Id == idCadete);
+        Cadete cad = listaCadetes.FirstOrDefault(x => x.Id == idCadete);
+        Pedido ped = listaPedidos.FirstOrDefault(pedido => pedido.Nro == nroPedido);
 
-        if(cad != null){
-            foreach(var p in listaPedidos){
-                if(p.Nro == nroPedido){
-                    p.VincularCadete(cad);
-                    asignacionRealizada = true;
-                    instance.accesoDatosPedidos.GuardarLista(listaPedidos);
-                    break;
-                }
-            }
+        if(cad != null && ped != null){
+            ped.VincularCadete(idCadete);
+            asignacionRealizada = true;
+            instance.accesoDatosPedidos.GuardarLista(listaPedidos);
         }
 
         return asignacionRealizada;
@@ -101,34 +97,28 @@ public class Cadeteria
     }
 
     public bool ReasignarPedidoACadete(int nroPedido, int idCadete){
+        bool reasignacionRealizada = false;
         List<Cadete> listaCadetes = accesoDatosCadetes.ObtenerListaCadetes();
         List<Pedido> listaPedidos = accesoDatosPedidos.ObtenerListaPedidos();
-        bool reasignacionRealizada = false;
         Cadete cad = listaCadetes.Find(cadete => cadete.Id == idCadete);
+        Pedido ped = listaPedidos.FirstOrDefault(pedido => pedido.Nro == nroPedido && pedido.Estado != EstadoPedido.Entregado);
 
-        if(cad != null){
-            foreach(var p in listaPedidos){
-                if(p.Nro == nroPedido && p.Estado != EstadoPedido.Entregado){
-                    p.VincularCadete(cad);
-                    reasignacionRealizada = true;
-                    instance.accesoDatosPedidos.GuardarLista(listaPedidos);
-                }
-            }
+        if(cad != null && ped != null){
+            ped.VincularCadete(idCadete);
+            reasignacionRealizada = true;
+            instance.accesoDatosPedidos.GuardarLista(listaPedidos);
         }
 
         return reasignacionRealizada;
     }
 
-    public int CantPedidosCadete(int idCadete, EstadoPedido estado){
+    private int CantPedidosCadete(int idCadete, EstadoPedido estado){
         List<Pedido> listaPedidos = accesoDatosPedidos.ObtenerListaPedidos();
-        int cant = 0;
-        foreach(var p in listaPedidos){
-            if((p.ExisteCadete()) && (p.IdCadete() == idCadete) && (p.Estado == estado)) cant++;
-        }
-
+        int cant = listaPedidos.Count(pedido => pedido.IdCadete == idCadete && pedido.Estado == estado);
         return cant;
     }
-    public double JornalACobrar(int idCadete){
+
+    private double JornalACobrar(int idCadete){
         return ((double)500 * CantPedidosCadete(idCadete, EstadoPedido.Entregado));
     }
 
